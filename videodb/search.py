@@ -204,8 +204,27 @@ class SceneSearch(Search):
         )
         return SearchResult(self._connection, **search_data)
 
-    def search_inside_collection(self, **kwargs):
-        raise NotImplementedError("Scene search will be implemented in the future")
+    def search_inside_collection(
+        self,
+        collection_id: str,
+        query: str,
+        scene_model: Optional[str] = None,
+        result_threshold: Optional[int] = None,
+        score_threshold: Optional[int] = None,
+        dynamic_score_percentage: Optional[int] = None,
+        **kwargs,
+    ):
+        search_data = self._connection.post(
+            path=f"{ApiPath.collection}/{collection_id}/{ApiPath.search}",
+            data={
+                "index_type": SearchType.scene,
+                "query": query,
+                "model_name": scene_model,
+                "score_threshold": score_threshold,
+                "result_threshold": result_threshold,
+            },
+        )
+        return SearchResult(self._connection, **search_data)
 
 
 search_type = {

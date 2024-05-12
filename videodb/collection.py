@@ -10,6 +10,7 @@ from videodb._upload import (
 from videodb._constants import (
     ApiPath,
     SearchType,
+    SceneModels,
 )
 from videodb.video import Video
 from videodb.audio import Audio
@@ -70,6 +71,7 @@ class Collection:
         self,
         query: str,
         search_type: Optional[str] = SearchType.semantic,
+        scene_model: Optional[str] = SceneModels.gpt4_vision,
         result_threshold: Optional[int] = None,
         score_threshold: Optional[int] = None,
         dynamic_score_percentage: Optional[int] = None,
@@ -81,6 +83,7 @@ class Collection:
             result_threshold=result_threshold,
             score_threshold=score_threshold,
             dynamic_score_percentage=dynamic_score_percentage,
+            scene_model=scene_model,
         )
 
     def upload(

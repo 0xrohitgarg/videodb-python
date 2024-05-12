@@ -47,7 +47,7 @@ class Video:
         self,
         query: str,
         search_type: Optional[str] = SearchType.semantic,
-        scene_model: Optional[str] = SceneModels.gemini_vision,
+        scene_model: Optional[str] = SceneModels.gpt4_vision,
         result_threshold: Optional[int] = None,
         score_threshold: Optional[int] = None,
         dynamic_score_percentage: Optional[int] = None,
