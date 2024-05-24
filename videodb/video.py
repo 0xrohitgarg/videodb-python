@@ -100,12 +100,17 @@ class Video:
         self.thumbnail_url = thumbnail_data.get("thumbnail_url")
         return self.thumbnail_url
 
-    def _fetch_transcript(self, force: bool = False) -> None:
+    def _fetch_transcript(
+        self, language_code: str = "en_us", force: bool = False
+    ) -> None:
         if self.transcript and not force:
             return
         transcript_data = self._connection.get(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.transcription}",
-            params={"force": "true" if force else "false"},
+            params={
+                "force": "true" if force else "false",
+                "language_code": language_code,
+            },
             show_progress=True,
         )
         self.transcript = transcript_data.get("word_timestamps", [])
@@ -119,14 +124,14 @@ class Video:
         self._fetch_transcript(force)
         return self.transcript_text
 
-    def index_spoken_words(self) -> None:
+    def index_spoken_words(self, language_code: str = "en_us") -> None:
         """Semantic indexing of spoken words in the video
 
         :raises InvalidRequestError: If the video is already indexed
         :return: None if the indexing is successful
         :rtype: None
         """
-        self._fetch_transcript()
+        self._fetch_transcript(language_code=language_code)
         self._connection.post(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
             data={
@@ -134,23 +139,20 @@ class Video:
             },
         )
 
-    def index_scenes(
+    def generate_scenes(
         self,
-        scene_model: str = SceneModels.gpt4_vision,
-        force: bool = False,
-        prompt: str = None,
+        pipeline: str = None,
+        include_keyframes: bool = True,
         threshold: float = None,
         min_scene_len: int = None,
         num_images: int = None,
         callback_url: str = None,
     ) -> None:
         self._connection.post(
-            path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
+            path=f"{ApiPath.video}/{self.id}/{ApiPath.generate_scenes}",
             data={
-                "index_type": IndexType.scene,
-                "model_name": scene_model,
-                "force": force,
-                "prompt": prompt,
+                "pipeline": pipeline,
+                "include_keyframes": include_keyframes,
                 "threshold": threshold,
                 "min_scene_len": min_scene_len,
                 "num_images": num_images,
@@ -158,8 +160,55 @@ class Video:
             },
         )
 
+    def index_scenes(
+        self,
+        scenes: dict = {},
+        scene_model: str = SceneModels.gpt4_vision,
+        custom_index_id: str = None,
+        force: bool = False,
+        prompt: str = None,
+        pipeline: str = None,
+        include_keyframes: bool = True,
+        threshold: float = None,
+        min_scene_len: int = None,
+        num_images: int = None,
+        callback_url: str = None,
+    ) -> None:
+        if scenes:
+            self._connection.post(
+                path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
+                data={
+                    "index_type": IndexType.scene,
+                    "model_name": scene_model,
+                    "custom_index_id": custom_index_id,
+                    "force": force,
+                    "prompt": prompt,
+                    "scenes": scenes,
+                    "callback_url": callback_url,
+                },
+            )
+        else:
+            self._connection.post(
+                path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
+                data={
+                    "index_type": IndexType.scene,
+                    "model_name": scene_model,
+                    "custom_index_id": custom_index_id,
+                    "force": force,
+                    "prompt": prompt,
+                    "pipeline": pipeline,
+                    "include_keyframes": include_keyframes,
+                    "threshold": threshold,
+                    "min_scene_len": min_scene_len,
+                    "num_images": num_images,
+                    "callback_url": callback_url,
+                },
+            )
+
     def get_scenes(
-        self, scene_model: str = SceneModels.gpt4_vision
+        self,
+        scene_model: str = SceneModels.gpt4_vision,
+        custom_index_id: str = None,
     ) -> Union[list, None]:
         if self.scenes:
             return self.scenes
@@ -168,6 +217,7 @@ class Video:
             params={
                 "index_type": IndexType.scene,
                 "model_name": scene_model,
+                "custom_index_id": custom_index_id,
             },
         )
         self.scenes = scene_data

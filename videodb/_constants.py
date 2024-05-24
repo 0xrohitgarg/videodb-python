@@ -48,6 +48,7 @@ class ApiPath:
     upload_url = "upload_url"
     transcription = "transcription"
     index = "index"
+    generate_scenes = "generate_scenes"
     search = "search"
     compile = "compile"
     workflow = "workflow"
