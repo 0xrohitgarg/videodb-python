@@ -312,8 +312,8 @@ class Video:
 
 
 class Frame:
-    def __init__(self, image_url: str, **kwargs) -> None:
-        self.image_url = image_url
+    def __init__(self, **kwargs) -> None:
+        self.image_url = kwargs.get("image_url", None)
         self.video_id = kwargs.get("video_id", None)
         self.start = kwargs.get("start", None)
         self.end = kwargs.get("end", None)
