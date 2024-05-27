@@ -196,7 +196,6 @@ class Video:
                     "custom_index_id": custom_index_id,
                     "force": force,
                     "prompt": prompt,
-                    "type": type,
                     "extraction_type": extraction_type,
                     "extraction_config": extraction_config,
                     "callback_url": callback_url,
