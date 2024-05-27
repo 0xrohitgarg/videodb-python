@@ -220,6 +220,27 @@ class Video:
         self.scenes = scene_data
         return scene_data if scene_data else None
 
+    def get_frames(
+        self,
+        scene_model: str = SceneModels.gpt4_vision,
+        custom_index_id: str = None,
+    ) -> Union[list, None]:
+        if self.scenes:
+            return self.scenes
+        frame_response = self._connection.get(
+            path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
+            params={
+                "index_type": IndexType.scene,
+                "model_name": scene_model,
+                "custom_index_id": custom_index_id,
+            },
+        )
+        frames = []
+        for frame in frame_response:
+            frame_object = Frame(**frame)
+            frames.append(frame_object)
+        return frames
+
     def delete_scene_index(self, scene_model: str = SceneModels.gpt4_vision) -> None:
         self._connection.post(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.index}/{ApiPath.delete}",
@@ -291,9 +312,9 @@ class Video:
 
 
 class Frame:
-    def __init__(self, image_url: str, video_id: str, **kwargs) -> None:
+    def __init__(self, image_url: str, **kwargs) -> None:
         self.image_url = image_url
-        self.video_id = video_id
+        self.video_id = kwargs.get("video_id", None)
         self.start = kwargs.get("start", None)
         self.end = kwargs.get("end", None)
         self.description = kwargs.get("description", None)
