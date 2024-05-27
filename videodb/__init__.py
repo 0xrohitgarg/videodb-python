@@ -10,6 +10,7 @@ from videodb._constants import (
     MediaType,
     SceneModels,
     SearchType,
+    ExtractionType,
     SubtitleAlignment,
     SubtitleBorderStyle,
     SubtitleStyle,
@@ -35,6 +36,7 @@ __all__ = [
     "play_stream",
     "MediaType",
     "SearchType",
+    "ExtractionType"
     "SubtitleAlignment",
     "SubtitleBorderStyle",
     "SubtitleStyle",
