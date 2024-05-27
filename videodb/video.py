@@ -145,6 +145,7 @@ class Video:
         extraction_type: str = ExtractionType.scene_based,
         extraction_config: dict = {},
         custom_index_id: str = None,
+        force: bool = False,
         callback_url: str = None,
     ) -> None:
         response = self._connection.post(
@@ -153,6 +154,7 @@ class Video:
                 "custom_index_id": custom_index_id,
                 "extraction_type": extraction_type,
                 "extraction_config": extraction_config,
+                "force": force,
             },
         )
         frames = []
