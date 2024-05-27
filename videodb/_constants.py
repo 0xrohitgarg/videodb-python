@@ -21,6 +21,9 @@ class IndexType:
     semantic = "semantic"
     scene = "scene"
 
+class ExtractionType:
+    scene_based = "scene"
+    compression_based = "compression"
 
 class SceneModels:
     gemini_vision: str = "gemini-vision"

@@ -2,6 +2,7 @@ from typing import Optional, Union
 from videodb._utils._video import play_stream
 from videodb._constants import (
     ApiPath,
+    ExtractionType,
     IndexType,
     SceneModels,
     SearchType,
@@ -139,42 +140,32 @@ class Video:
             },
         )
 
-    def generate_scenes(
+    def extract_frames(
         self,
-        pipeline: str = None,
-        include_keyframes: bool = True,
-        threshold: float = None,
-        min_scene_len: int = None,
-        num_images: int = None,
+        extraction_type: str = ExtractionType.scene_based,
+        extraction_config: dict = {},
         callback_url: str = None,
     ) -> None:
         self._connection.post(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.generate_scenes}",
             data={
-                "pipeline": pipeline,
-                "include_keyframes": include_keyframes,
-                "threshold": threshold,
-                "min_scene_len": min_scene_len,
-                "num_images": num_images,
-                "callback_url": callback_url,
+                "extraction_type": extraction_type,
+                "extraction_config": extraction_config,
             },
         )
 
     def index_scenes(
         self,
-        scenes: dict = {},
         scene_model: str = SceneModels.gpt4_vision,
+        prompt: str = None,
         custom_index_id: str = None,
         force: bool = False,
-        prompt: str = None,
-        pipeline: str = None,
-        include_keyframes: bool = True,
-        threshold: float = None,
-        min_scene_len: int = None,
-        num_images: int = None,
+        extraction_type: str = ExtractionType.scene_based,
+        extraction_config: dict = {},
+        frames: dict = {},
         callback_url: str = None,
     ) -> None:
-        if scenes:
+        if frames:
             self._connection.post(
                 path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
                 data={
@@ -183,7 +174,7 @@ class Video:
                     "custom_index_id": custom_index_id,
                     "force": force,
                     "prompt": prompt,
-                    "scenes": scenes,
+                    "frames": frames,
                     "callback_url": callback_url,
                 },
             )
@@ -196,11 +187,9 @@ class Video:
                     "custom_index_id": custom_index_id,
                     "force": force,
                     "prompt": prompt,
-                    "pipeline": pipeline,
-                    "include_keyframes": include_keyframes,
-                    "threshold": threshold,
-                    "min_scene_len": min_scene_len,
-                    "num_images": num_images,
+                    "type": type,
+                    "extraction_type": extraction_type,
+                    "extraction_config": extraction_config,
                     "callback_url": callback_url,
                 },
             )
