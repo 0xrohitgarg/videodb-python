@@ -144,15 +144,22 @@ class Video:
         self,
         extraction_type: str = ExtractionType.scene_based,
         extraction_config: dict = {},
+        custom_index_id: str = None,
         callback_url: str = None,
     ) -> None:
-        self._connection.post(
+        response = self._connection.post(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.generate_scenes}",
             data={
+                "custom_index_id": custom_index_id,
                 "extraction_type": extraction_type,
                 "extraction_config": extraction_config,
             },
         )
+        frames = []
+        for frame in response:
+            frame_object = Frame(**frame)
+            frames.append(frame_object)
+        return frames
 
     def index_scenes(
         self,
@@ -280,3 +287,24 @@ class Video:
         :rtype: str
         """
         return play_stream(self.stream_url)
+
+
+class Frame:
+    def __init__(self, image_url: str, video_id: str, **kwargs) -> None:
+        self.image_url = image_url
+        self.video_id = video_id
+        self.start = kwargs.get("start", None)
+        self.end = kwargs.get("end", None)
+        self.description = kwargs.get("description", None)
+        self.frame_time = kwargs.get("frame_time", None)
+
+    def __repr__(self) -> str:
+        return (
+            f"Frame("
+            f"image_url={self.image_url}, "
+            f"video_id={self.video_id}, "
+            f"start={self.start}, "
+            f"end={self.end}, "
+            f"description={self.description}, "
+            f"frame_time={self.frame_time})"
+        )
