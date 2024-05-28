@@ -24,6 +24,7 @@ class IndexType:
 class ExtractionType:
     scene_based = "scene"
     compression_based = "compression"
+    time_based = "time"
 
 class SceneModels:
     gemini_vision: str = "gemini-vision"
