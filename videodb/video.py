@@ -1,4 +1,7 @@
+import copy
+
 from typing import Optional, Union
+
 from videodb._utils._video import play_stream
 from videodb._constants import (
     ApiPath,
@@ -175,6 +178,8 @@ class Video:
         callback_url: str = None,
     ) -> None:
         if frames:
+            # TODO: Validate the each frame element for type
+            # Also fix the type of frames func arg above
             self._connection.post(
                 path=f"{ApiPath.video}/{self.id}/{ApiPath.index}",
                 data={
@@ -183,7 +188,7 @@ class Video:
                     "custom_index_id": custom_index_id,
                     "force": force,
                     "prompt": prompt,
-                    "frames": frames,
+                    "frames": [frame.to_json() for frame in frames],
                     "callback_url": callback_url,
                 },
             )
@@ -313,12 +318,14 @@ class Video:
 
 class Frame:
     def __init__(self, **kwargs) -> None:
+        # TODO: Make mandatory params as explicit args
         self.image_url = kwargs.get("image_url", None)
         self.video_id = kwargs.get("video_id", None)
         self.start = kwargs.get("start", None)
         self.end = kwargs.get("end", None)
         self.description = kwargs.get("description", None)
         self.frame_time = kwargs.get("frame_time", None)
+        self.frame_no = kwargs.get("frame_no", None)
 
     def __repr__(self) -> str:
         return (
@@ -328,5 +335,9 @@ class Frame:
             f"start={self.start}, "
             f"end={self.end}, "
             f"description={self.description}, "
-            f"frame_time={self.frame_time})"
+            f"frame_time={self.frame_time}), "
+            f"frame_no={self.frame_no})"
         )
+
+    def to_json(self) -> dict:
+        return copy.deepcopy(self.__dict__)
