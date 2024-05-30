@@ -162,7 +162,7 @@ class Video:
         )
         frames = []
         for frame in response:
-            frame_object = Frame(**frame)
+            frame_object = Frame(connection=self._connection, **frame)
             frames.append(frame_object)
         return frames
 
@@ -242,7 +242,7 @@ class Video:
         )
         frames = []
         for frame in frame_response:
-            frame_object = Frame(**frame)
+            frame_object = Frame(connection=self._connection, **frame)
             frames.append(frame_object)
         return frames
 
@@ -319,6 +319,7 @@ class Video:
 class Frame:
     def __init__(self, **kwargs) -> None:
         # TODO: Make mandatory params as explicit args
+        self.connection = kwargs.get("connection", None)
         self.image_url = kwargs.get("image_url", None)
         self.video_id = kwargs.get("video_id", None)
         self.start = kwargs.get("start", None)
@@ -335,9 +336,26 @@ class Frame:
             f"start={self.start}, "
             f"end={self.end}, "
             f"description={self.description}, "
-            f"frame_time={self.frame_time}), "
+            f"frame_time={self.frame_time}, "
             f"frame_no={self.frame_no})"
         )
 
     def to_json(self) -> dict:
         return copy.deepcopy(self.__dict__)
+
+    def describe(self, model=SceneModels.gpt4_vision, prompt=None):
+        if self.connection and self.video_id and self.image_url:
+            description_data = self.connection.post(
+                path=f"{ApiPath.video}/{self.video_id}/{ApiPath.frame}/{ApiPath.describe}",
+                data={
+                    "image_url": self.image_url,
+                    "prompt": prompt,
+                    "model_name": model,
+                },
+            )
+            self.description = description_data.get("description")
+            return self.description
+        else:
+            raise ValueError(
+                "Please make sure connection, video_id and and image_url are set."
+            )

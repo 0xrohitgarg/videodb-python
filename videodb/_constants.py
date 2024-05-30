@@ -58,6 +58,8 @@ class ApiPath:
     workflow = "workflow"
     timeline = "timeline"
     delete = "delete"
+    frame = "frame"
+    describe = "describe"
 
 
 class Status:
