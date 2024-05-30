@@ -1,7 +1,7 @@
 from typing import Union
 
 from videodb._constants import ApiPath
-from videodb.asset import VideoAsset, AudioAsset, ImageAsset
+from videodb.asset import VideoAsset, AudioAsset, ImageAsset, TextAsset
 
 
 class Timeline(object):
@@ -28,9 +28,17 @@ class Timeline(object):
             raise ValueError("asset must be of type VideoAsset")
         self._timeline.append(asset)
 
-    def add_overlay(self, start: int, asset: Union[AudioAsset, ImageAsset]) -> None:
-        if not isinstance(asset, AudioAsset) and not isinstance(asset, ImageAsset):
-            raise ValueError("asset must be of type AudioAsset or ImageAsset")
+    def add_overlay(
+        self, start: int, asset: Union[AudioAsset, ImageAsset, TextAsset]
+    ) -> None:
+        if (
+            not isinstance(asset, AudioAsset)
+            and not isinstance(asset, ImageAsset)
+            and not isinstance(asset, TextAsset)
+        ):
+            raise ValueError(
+                "asset must be of type AudioAsset, ImageAsset or TextAsset"
+            )
         self._timeline.append((start, asset))
 
     def generate_stream(self) -> str:

@@ -1,5 +1,6 @@
 """Constants used in the videodb package."""
 
+from typing import Union
 from dataclasses import dataclass
 
 VIDEO_DB_API: str = "https://api.videodb.io"
@@ -21,10 +22,12 @@ class IndexType:
     semantic = "semantic"
     scene = "scene"
 
+
 class ExtractionType:
     scene_based = "scene"
     compression_based = "compression"
     time_based = "time"
+
 
 class SceneModels:
     gemini_vision: str = "gemini-vision"
@@ -119,3 +122,31 @@ class SubtitleStyle:
     margin_l: int = 10
     margin_r: int = 10
     margin_v: int = 10
+
+@dataclass
+class TextStyle:
+    fontsize: int = 24
+    fontcolor: str = "black"
+    fontcolor_expr: str = ""
+    alpha: float = 1.0
+    font: str = "Sans"
+    box: bool = True
+    boxcolor: str = "white"
+    boxborderw: str = "10"
+    boxw: int = 0
+    boxh: int = 0
+    line_spacing: int = 0
+    text_align: str = "T"
+    y_align: str = "text"
+    borderw: int = 0
+    bordercolor: str = "black"
+    expansion: str = "normal"
+    basetime: int = 0
+    fix_bounds: bool = False
+    text_shaping: bool = True
+    shadowcolor: str = "black"
+    shadowx: int = 0
+    shadowy: int = 0
+    tabsize: int = 4
+    x: Union[str, int] = "(main_w-text_w)/2"
+    y: Union[str, int] = "(main_h-text_h)/2"
