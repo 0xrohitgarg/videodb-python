@@ -55,6 +55,7 @@ class Video:
         result_threshold: Optional[int] = None,
         score_threshold: Optional[int] = None,
         dynamic_score_percentage: Optional[int] = None,
+        custom_index_id: Optional[str] = None,
     ) -> SearchResult:
         search = SearchFactory(self._connection).get_search(search_type)
         return search.search_inside_video(
@@ -64,6 +65,7 @@ class Video:
             score_threshold=score_threshold,
             dynamic_score_percentage=dynamic_score_percentage,
             scene_model=scene_model,
+            custom_index_id=custom_index_id,
         )
 
     def delete(self) -> None:
@@ -246,12 +248,17 @@ class Video:
             frames.append(frame_object)
         return frames
 
-    def delete_scene_index(self, scene_model: str = SceneModels.gpt4_vision) -> None:
+    def delete_scene_index(
+        self,
+        scene_model: str = SceneModels.gpt4_vision,
+        custom_index_id: str = "default",
+    ) -> None:
         self._connection.post(
             path=f"{ApiPath.video}/{self.id}/{ApiPath.index}/{ApiPath.delete}",
             data={
                 "index_type": IndexType.scene,
                 "model_name": scene_model,
+                "custom_index_id": custom_index_id,
             },
         )
         self.scenes = None
