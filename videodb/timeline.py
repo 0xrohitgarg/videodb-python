@@ -1,7 +1,15 @@
+import os
+import requests
+
 from typing import Union
 
 from videodb._constants import ApiPath
 from videodb.asset import VideoAsset, AudioAsset, ImageAsset, TextAsset
+
+
+STREAMING_API = os.getenv(
+    "STREAMING_API", "https://vcmgicsv1d.execute-api.us-east-1.amazonaws.com"
+)
 
 
 class Timeline(object):
@@ -49,6 +57,19 @@ class Timeline(object):
                 "timeline": self.to_json().get("timeline"),
             },
         )
+        try:
+            streaming_data = requests.post(
+                f"{STREAMING_API}/timeline",
+                json={
+                    "timeline": self.to_json().get("timeline"),
+                },
+            )
+            streaming_data.raise_for_status()
+            stream_data["stream_url"] = streaming_data.json().get("stream_url")
+
+        except Exception as e:
+            raise ValueError("Error while generating new poc stream", e)
+
         self.stream_url = stream_data.get("stream_url")
         self.player_url = stream_data.get("player_url")
         return stream_data.get("stream_url", None)

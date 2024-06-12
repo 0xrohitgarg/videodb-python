@@ -1,4 +1,5 @@
 import requests
+import os
 
 from typing import Optional
 from requests import HTTPError
@@ -11,6 +12,12 @@ from videodb._constants import (
 from videodb.exceptions import (
     VideodbError,
 )
+
+
+STREAMING_API = os.getenv(
+    "STREAMING_API", "https://vcmgicsv1d.execute-api.us-east-1.amazonaws.com"
+)
+SEGMENT_DURATION = os.getenv("SEGMENT_DURATION", 1)
 
 
 def upload(
@@ -57,4 +64,23 @@ def upload(
             "media_type": media_type,
         },
     )
+
+    # Temporary test code for streaming
+    try:
+        media_id = upload_data.get("id", "")
+        if media_id.startswith("m-"):
+            streaming_data = requests.post(
+                f"{STREAMING_API}/upload",
+                json={
+                    "url": url,
+                    "media_id": media_id,
+                    "user_id": _connection.user_id,
+                    "segment_duration": SEGMENT_DURATION,
+                },
+            )
+            streaming_data.raise_for_status()
+            streaming_data = streaming_data.json()
+            upload_data["stream_url"] = streaming_data.get("stream_url")
+    except HTTPError as e:
+        raise VideodbError("Error while uploading file", cause=e)
     return upload_data

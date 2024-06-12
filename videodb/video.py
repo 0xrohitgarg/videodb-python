@@ -1,3 +1,6 @@
+import os
+import requests
+
 from typing import Optional, Union, List, Dict, Tuple
 from videodb._utils._video import play_stream
 from videodb._constants import (
@@ -10,6 +13,11 @@ from videodb._constants import (
 from videodb.image import Image
 from videodb.search import SearchFactory, SearchResult
 from videodb.shot import Shot
+
+
+STREAMING_API = os.getenv(
+    "STREAMING_API", "https://vcmgicsv1d.execute-api.us-east-1.amazonaws.com"
+)
 
 
 class Video:
@@ -87,6 +95,20 @@ class Video:
                 "length": self.length,
             },
         )
+        self.player_url = stream_data.get("player_url", None)
+        try:
+            streaming_data = requests.post(
+                f"{STREAMING_API}/stream",
+                json={
+                    "media_id": self.id,
+                    "timeline": timeline,
+                },
+            )
+            streaming_data.raise_for_status()
+            stream_data["stream_url"] = streaming_data.json().get("stream_url")
+        except Exception as e:
+            raise ValueError("Error while generating new poc stream", e)
+
         return stream_data.get("stream_url", None)
 
     def generate_thumbnail(self, time: Optional[float] = None) -> Union[str, Image]:

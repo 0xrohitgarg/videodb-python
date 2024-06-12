@@ -33,6 +33,7 @@ class Connection(HttpClient):
     def get_collection(self, collection_id: Optional[str] = "default") -> Collection:
         collection_data = self.get(path=f"{ApiPath.collection}/{collection_id}")
         self.collection_id = collection_data.get("id", "default")
+        self.user_id = collection_data.get("owner")
         return Collection(
             self,
             self.collection_id,

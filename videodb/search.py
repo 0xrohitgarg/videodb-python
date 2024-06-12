@@ -1,3 +1,6 @@
+import os
+import requests
+
 from abc import ABC, abstractmethod
 from videodb._utils._video import play_stream
 from videodb._constants import (
@@ -10,6 +13,11 @@ from videodb.exceptions import (
 )
 from typing import Optional, List
 from videodb.shot import Shot
+
+
+STREAMING_API = os.getenv(
+    "STREAMING_API", "https://vcmgicsv1d.execute-api.us-east-1.amazonaws.com"
+)
 
 
 class SearchResult:
@@ -72,6 +80,24 @@ class SearchResult:
                     for shot in self.shots
                 ],
             )
+
+            try:
+                streaming_data = requests.post(
+                    f"{STREAMING_API}/compile",
+                    json=[
+                        {
+                            "video_id": shot.video_id,
+                            "collection_id": self.collection_id,
+                            "shots": [(shot.start, shot.end)],
+                        }
+                        for shot in self.shots
+                    ],
+                )
+                streaming_data.raise_for_status()
+                compile_data["stream_url"] = streaming_data.json().get("stream_url")
+
+            except Exception as e:
+                raise SearchError(f"Error while generateing new poc stream: {e}")
             self.stream_url = compile_data.get("stream_url")
             self.player_url = compile_data.get("player_url")
             return self.stream_url
