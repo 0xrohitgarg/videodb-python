@@ -18,6 +18,7 @@ STREAMING_API = os.getenv(
     "STREAMING_API", "https://vcmgicsv1d.execute-api.us-east-1.amazonaws.com"
 )
 SEGMENT_DURATION = os.getenv("SEGMENT_DURATION", 1)
+SEGMENT_TYPE = os.getenv("SEGMENT_TYPE", "fmp4")
 
 
 def upload(
@@ -76,6 +77,7 @@ def upload(
                     "media_id": media_id,
                     "user_id": _connection.user_id,
                     "segment_duration": SEGMENT_DURATION,
+                    "segment_type": SEGMENT_TYPE,
                 },
             )
             streaming_data.raise_for_status()
