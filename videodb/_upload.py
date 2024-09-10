@@ -2,7 +2,7 @@ import requests
 
 from typing import Optional
 from requests import HTTPError
-
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 from videodb._constants import (
     ApiPath,
@@ -36,9 +36,12 @@ def upload(
             )
             upload_url = upload_url_data.get("upload_url")
             with open(file_path, "rb") as file:
-                files = {"file": (name, file)}
-                response = requests.post(upload_url, files=files)
-                response.raise_for_status()
+                encoder = MultipartEncoder(fields={"file": (name, file)})
+                headers = {"Content-Type": encoder.content_type}
+                with requests.post(
+                    upload_url, data=encoder, headers=headers
+                ) as response:
+                    response.raise_for_status()
                 url = upload_url
 
         except FileNotFoundError as e:

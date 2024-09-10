@@ -34,6 +34,7 @@ setup(
         "requests>=2.25.1",
         "backoff>=2.2.1",
         "tqdm>=4.66.1",
+        "requests-toolbelt==1.0.0",
     ],
     classifiers=[
         "Intended Audience :: Developers",
