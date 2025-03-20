@@ -9,7 +9,7 @@ class Audio:
     :ivar str id: Unique identifier for the audio
     :ivar str collection_id: ID of the collection this audio belongs to
     :ivar str name: Name of the audio file
-    :ivar float length: Duration of the audio in seconds
+    :ivar float length: Duration of the audio in second
     """
 
     def __init__(
